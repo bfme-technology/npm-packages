@@ -1,7 +1,7 @@
 export const gridWrapperClass = "flex w-full flex-col gap-3";
 
 export const gridContainerClass =
-  "ag-grid-container ag-theme-alpine h-[65vh] min-h-[520px] w-full overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/70";
+  "ag-grid-container h-[65vh] min-h-[520px] w-full overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/70";
 
 export const paginationContainerClass =
   "flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900";

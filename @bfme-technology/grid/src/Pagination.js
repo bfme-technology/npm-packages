@@ -61,49 +61,60 @@ const Pagination = ({
     }
   };
 
-  return (
-    <div className={paginationContainerClass}>
-      <div className={paginationInfoClass}>
-        Showing {startRecord} to {endRecord} of {total} entries
-      </div>
-      <div className={paginationControlsClass}>
-        <span className={pageSizeSelectorClass}>
-          Page size:
-          <select
-            className={pageSizeSelectClass}
-            value={paginationPageSize || perPage}
-            onChange={handlePageSizeChange}
-          >
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </span>
-
-        <button
-          type="button"
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-          className={paginationButtonClass}
-        >
-          Previous
-        </button>
-
-        <span className={pageInfoClass}>
-          Page {currentPage} of {lastPage}
-        </span>
-
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={currentPage === lastPage}
-          className={paginationButtonClass}
-        >
-          Next
-        </button>
-      </div>
-    </div>
+  return React.createElement(
+    "div",
+    { className: paginationContainerClass },
+    React.createElement(
+      "div",
+      { className: paginationInfoClass },
+      `Showing ${startRecord} to ${endRecord} of ${total} entries`,
+    ),
+    React.createElement(
+      "div",
+      { className: paginationControlsClass },
+      React.createElement(
+        "span",
+        { className: pageSizeSelectorClass },
+        "Page size:",
+        React.createElement(
+          "select",
+          {
+            className: pageSizeSelectClass,
+            value: paginationPageSize || perPage,
+            onChange: handlePageSizeChange,
+          },
+          React.createElement("option", { value: "10" }, "10"),
+          React.createElement("option", { value: "20" }, "20"),
+          React.createElement("option", { value: "50" }, "50"),
+          React.createElement("option", { value: "100" }, "100"),
+        ),
+      ),
+      React.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: handlePrevious,
+          disabled: currentPage === 1,
+          className: paginationButtonClass,
+        },
+        "Previous",
+      ),
+      React.createElement(
+        "span",
+        { className: pageInfoClass },
+        `Page ${currentPage} of ${lastPage}`,
+      ),
+      React.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: handleNext,
+          disabled: currentPage === lastPage,
+          className: paginationButtonClass,
+        },
+        "Next",
+      ),
+    ),
   );
 };
 

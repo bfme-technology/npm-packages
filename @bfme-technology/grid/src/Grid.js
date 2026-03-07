@@ -30,6 +30,41 @@ const getResolvedTheme = (themeMode) => {
   return getSystemTheme();
 };
 
+const stripAgThemeClasses = (value) =>
+  typeof value === "string"
+    ? value.replace(/\bag-theme-[^\s]+\b/g, "").replace(/\s+/g, " ").trim()
+    : "";
+
+const getThemeCssVariables = (resolvedTheme) => {
+  if (resolvedTheme !== "dark") {
+    return {
+      "--ag-background-color": "#ffffff",
+      "--ag-foreground-color": "#0f172a",
+      "--ag-header-background-color": "#f8fafc",
+      "--ag-header-foreground-color": "#0f172a",
+      "--ag-odd-row-background-color": "#ffffff",
+      "--ag-border-color": "#e2e8f0",
+      "--ag-row-border-color": "#e2e8f0",
+      "--ag-selected-row-background-color": "rgba(99, 102, 241, 0.12)",
+      "--ag-hover-color": "rgba(99, 102, 241, 0.08)",
+      "--ag-input-border-color": "#cbd5e1",
+    };
+  }
+
+  return {
+    "--ag-background-color": "#0f172a",
+    "--ag-foreground-color": "#e2e8f0",
+    "--ag-header-background-color": "#1e293b",
+    "--ag-header-foreground-color": "#f1f5f9",
+    "--ag-odd-row-background-color": "#111827",
+    "--ag-border-color": "#334155",
+    "--ag-row-border-color": "#334155",
+    "--ag-selected-row-background-color": "rgba(99, 102, 241, 0.22)",
+    "--ag-hover-color": "rgba(148, 163, 184, 0.12)",
+    "--ag-input-border-color": "#475569",
+  };
+};
+
 const Grid = (props) => {
   const {
     paginatorInfo,
@@ -93,26 +128,33 @@ const Grid = (props) => {
     [resolvedTheme],
   );
 
-  const mergedContainerClassName =
-    typeof containerClassName === "string" && containerClassName.trim().length
-      ? `${gridContainerClass} ${agThemeClassName} ${containerClassName}`
-      : `${gridContainerClass} ${agThemeClassName}`;
+  const sanitizedContainerClassName = stripAgThemeClasses(containerClassName);
 
-  return (
-    <div className={gridWrapperClass}>
-      <div className={mergedContainerClassName} style={containerStyle}>
-        <AgGridReact {...gridProps} />
-      </div>
+  const mergedContainerClassName = sanitizedContainerClassName
+    ? `${gridContainerClass} ${agThemeClassName} ${sanitizedContainerClassName}`
+    : `${gridContainerClass} ${agThemeClassName}`;
 
-      {paginatorInfo ? (
-        <Pagination
-          paginatorInfo={paginatorInfo}
-          paginationPageSize={paginationPageSize}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-        />
-      ) : null}
-    </div>
+  const mergedContainerStyle = {
+    ...getThemeCssVariables(resolvedTheme),
+    ...(containerStyle || {}),
+  };
+
+  return React.createElement(
+    "div",
+    { className: gridWrapperClass },
+    React.createElement(
+      "div",
+      { className: mergedContainerClassName, style: mergedContainerStyle },
+      React.createElement(AgGridReact, { ...gridProps }),
+    ),
+    paginatorInfo
+      ? React.createElement(Pagination, {
+          paginatorInfo,
+          paginationPageSize,
+          onPageChange,
+          onPageSizeChange,
+        })
+      : null,
   );
 };
 
