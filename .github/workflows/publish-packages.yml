@@ -50,6 +50,11 @@ jobs:
               packageJsonPath: '@bfme-technology/spa/package.json',
               directoryPath: '@bfme-technology/spa/',
             },
+            {
+              name: '@bfme-technology/grid',
+              packageJsonPath: '@bfme-technology/grid/package.json',
+              directoryPath: '@bfme-technology/grid/',
+            },
           ];
 
           const readVersionAtRef = (ref, filePath) => {
@@ -146,4 +151,25 @@ jobs:
           fi
 
           cd @bfme-technology/spa
+          npm publish --access public --provenance
+
+      - name: Publish @bfme-technology/grid
+        if: contains(steps.detect.outputs.changed, '@bfme-technology/grid')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./@bfme-technology/grid/package.json').version")
+          if npm view "@bfme-technology/grid@${VERSION}" version >/dev/null 2>&1; then
+            echo "@bfme-technology/grid@${VERSION} already exists on npm. Skipping."
+            exit 0
+          fi
+
+          LOCAL_SHA=$(cd @bfme-technology/grid && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
+          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/grid@latest" dist.shasum 2>/dev/null || true)
+          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
+            echo "@bfme-technology/grid content matches npm latest. Skipping publish."
+            exit 0
+          fi
+
+          cd @bfme-technology/grid
           npm publish --access public --provenance
