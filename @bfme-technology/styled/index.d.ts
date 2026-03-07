@@ -1,0 +1,51 @@
+import type React from "react";
+
+export type DocumentationStyleMap = {
+  root: React.CSSProperties;
+  loadingRoot: React.CSSProperties;
+  loadingCard: React.CSSProperties;
+  contentWrap: React.CSSProperties;
+  main: React.CSSProperties;
+  centerSection: React.CSSProperties;
+};
+
+export declare const documentationBaseStyles: DocumentationStyleMap;
+export declare const documentationBaseLayoutStyles: DocumentationStyleMap;
+
+export declare const layoutWrapperClass: string;
+export declare const getSidebarClass: (args: { isCollapsed: boolean; isOpen: boolean }) => string;
+export declare const logoAdminClass: string;
+export declare const navClass: string;
+export declare const getLayoutNavLinkClass: (args: { isActive: boolean }) => string;
+export declare const navIconClass: string;
+export declare const navLinkTextClass: string;
+export declare const layoutMainClass: string;
+export declare const topbarClass: string;
+export declare const topbarTitleClass: string;
+export declare const themeToggleContainerClass: string;
+export declare const getThemeToggleButtonClass: (args: { isActive: boolean }) => string;
+export declare const contentAreaClass: string;
+export declare const breadcrumbContainerClass: string;
+export declare const breadcrumbListClass: string;
+export declare const breadcrumbItemClass: string;
+export declare const breadcrumbLinkClass: string;
+export declare const breadcrumbActiveItemClass: string;
+export declare const breadcrumbSeparatorClass: string;
+export declare const dashboardContainerClass: string;
+export declare const dashboardRootClass: string;
+export declare const dashboardTitleClass: string;
+export declare const metricsGridClass: string;
+export declare const metricCardClass: string;
+export declare const metricCardTitleClass: string;
+export declare const metricValueClass: string;
+export declare const gridContainerClass: string;
+export declare const gridPageWrapperClass: string;
+export declare const gridHeaderSectionClass: string;
+export declare const gridHeaderTitleClass: string;
+export declare const gridActionsSectionClass: string;
+export declare const gridFilterSectionClass: string;
+export declare const gridFilterLabelClass: string;
+export declare const gridFilterSelectClass: string;
+export declare const gridPrimaryButtonClass: string;
+export declare const gridContentSectionClass: string;
+export declare const gridEmptyTextClass: string;
