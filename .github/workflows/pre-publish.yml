@@ -1,17 +1,15 @@
-name: Publish npm packages
+name: Pre-publish package checks
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened, synchronize, reopened]
     branches: [main]
 
 jobs:
-  publish:
-    if: github.event.pull_request.merged == true
+  detect-package-changes:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
 
     steps:
       - name: Checkout
@@ -23,13 +21,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org
 
       - name: Detect package changes
         id: detect
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           node <<'NODE'
           const { execSync } = require('child_process');
@@ -102,48 +99,20 @@ jobs:
           fs.appendFileSync(outputFile, `has_changes=${changedPackages.length > 0}\n`);
           NODE
 
-      - name: Skip publish when no package changes detected
-        if: steps.detect.outputs.has_changes != 'true'
-        run: echo "No package changes detected. Skipping publish."
-
-      - name: Publish @bfme-technology/styled
-        if: contains(steps.detect.outputs.changed, '@bfme-technology/styled')
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Report detected package changes
         run: |
-          VERSION=$(node -p "require('./@bfme-technology/styled/package.json').version")
-          if npm view "@bfme-technology/styled@${VERSION}" version >/dev/null 2>&1; then
-            echo "@bfme-technology/styled@${VERSION} already exists on npm. Skipping."
-            exit 0
+          if [ "${{ steps.detect.outputs.has_changes }}" = "true" ]; then
+            echo "Detected package changes: ${{ steps.detect.outputs.changed }}"
+            {
+              echo "## Pre-publish check"
+              echo "Detected package changes: ${{ steps.detect.outputs.changed }}"
+              echo "No publish is performed in this workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No package changes detected."
+            {
+              echo "## Pre-publish check"
+              echo "No package changes detected."
+              echo "No publish is performed in this workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
-
-          LOCAL_SHA=$(cd @bfme-technology/styled && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
-          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/styled@latest" dist.shasum 2>/dev/null || true)
-          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
-            echo "@bfme-technology/styled content matches npm latest. Skipping publish."
-            exit 0
-          fi
-
-          cd @bfme-technology/styled
-          npm publish --access public --provenance
-
-      - name: Publish @bfme-technology/spa
-        if: contains(steps.detect.outputs.changed, '@bfme-technology/spa')
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          VERSION=$(node -p "require('./@bfme-technology/spa/package.json').version")
-          if npm view "@bfme-technology/spa@${VERSION}" version >/dev/null 2>&1; then
-            echo "@bfme-technology/spa@${VERSION} already exists on npm. Skipping."
-            exit 0
-          fi
-
-          LOCAL_SHA=$(cd @bfme-technology/spa && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
-          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/spa@latest" dist.shasum 2>/dev/null || true)
-          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
-            echo "@bfme-technology/spa content matches npm latest. Skipping publish."
-            exit 0
-          fi
-
-          cd @bfme-technology/spa
-          npm publish --access public --provenance
