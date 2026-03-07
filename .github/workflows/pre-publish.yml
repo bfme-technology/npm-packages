@@ -47,6 +47,11 @@ jobs:
               packageJsonPath: '@bfme-technology/spa/package.json',
               directoryPath: '@bfme-technology/spa/',
             },
+            {
+              name: '@bfme-technology/grid',
+              packageJsonPath: '@bfme-technology/grid/package.json',
+              directoryPath: '@bfme-technology/grid/',
+            },
           ];
 
           const readVersionAtRef = (ref, filePath) => {
