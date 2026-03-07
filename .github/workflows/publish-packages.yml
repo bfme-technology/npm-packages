@@ -1,0 +1,105 @@
+name: Publish npm packages
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  publish:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Detect package version changes
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+        run: |
+          node <<'NODE'
+          const { execSync } = require('child_process');
+          const fs = require('fs');
+
+          const base = process.env.BASE_SHA;
+          const head = process.env.HEAD_SHA;
+          const outputFile = process.env.GITHUB_OUTPUT;
+
+          const packages = [
+            { name: '@bfme-technology/styled', path: '@bfme-technology/styled/package.json' },
+            { name: '@bfme-technology/spa', path: '@bfme-technology/spa/package.json' },
+          ];
+
+          const readVersionAtRef = (ref, filePath) => {
+            try {
+              const content = execSync(`git show ${ref}:${filePath}`, { encoding: 'utf8' });
+              const parsed = JSON.parse(content);
+              return parsed.version ?? null;
+            } catch {
+              return null;
+            }
+          };
+
+          const changedPackages = [];
+
+          for (const pkg of packages) {
+            const baseVersion = readVersionAtRef(base, pkg.path);
+            const headVersion = readVersionAtRef(head, pkg.path);
+            const versionChanged = Boolean(headVersion) && headVersion !== baseVersion;
+
+            console.log(`${pkg.name}: ${baseVersion} -> ${headVersion} (changed=${versionChanged})`);
+
+            if (versionChanged) {
+              changedPackages.push(pkg.name);
+            }
+          }
+
+          fs.appendFileSync(outputFile, `changed=${changedPackages.join(',')}\n`);
+          fs.appendFileSync(outputFile, `has_changes=${changedPackages.length > 0}\n`);
+          NODE
+
+      - name: Skip publish when no package versions changed
+        if: steps.detect.outputs.has_changes != 'true'
+        run: echo "No package version changes detected. Skipping publish."
+
+      - name: Publish @bfme-technology/styled
+        if: contains(steps.detect.outputs.changed, '@bfme-technology/styled')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./@bfme-technology/styled/package.json').version")
+          if npm view "@bfme-technology/styled@${VERSION}" version >/dev/null 2>&1; then
+            echo "@bfme-technology/styled@${VERSION} already exists on npm. Skipping."
+            exit 0
+          fi
+
+          cd @bfme-technology/styled
+          npm publish --access public --provenance
+
+      - name: Publish @bfme-technology/spa
+        if: contains(steps.detect.outputs.changed, '@bfme-technology/spa')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./@bfme-technology/spa/package.json').version")
+          if npm view "@bfme-technology/spa@${VERSION}" version >/dev/null 2>&1; then
+            echo "@bfme-technology/spa@${VERSION} already exists on npm. Skipping."
+            exit 0
+          fi
+
+          cd @bfme-technology/spa
+          npm publish --access public --provenance
