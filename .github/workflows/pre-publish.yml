@@ -1,0 +1,107 @@
+name: Pre-publish package checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+jobs:
+  detect-package-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Detect package changes
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node <<'NODE'
+          const { execSync } = require('child_process');
+          const fs = require('fs');
+
+          const base = process.env.BASE_SHA;
+          const head = process.env.HEAD_SHA;
+          const outputFile = process.env.GITHUB_OUTPUT;
+
+          const packages = [
+            {
+              name: '@bfme-technology/styled',
+              packageJsonPath: '@bfme-technology/styled/package.json',
+              directoryPath: '@bfme-technology/styled/',
+            },
+            {
+              name: '@bfme-technology/spa',
+              packageJsonPath: '@bfme-technology/spa/package.json',
+              directoryPath: '@bfme-technology/spa/',
+            },
+          ];
+
+          const readVersionAtRef = (ref, filePath) => {
+            try {
+              const content = execSync(`git show ${ref}:${filePath}`, { encoding: 'utf8' });
+              const parsed = JSON.parse(content);
+              return parsed.version ?? null;
+            } catch {
+              return null;
+            }
+          };
+
+          const packageFilesChanged = (baseRef, headRef, directoryPath) => {
+            try {
+              const output = execSync(`git diff --name-only ${baseRef} ${headRef} -- ${directoryPath}`, { encoding: 'utf8' }).trim();
+              return output.length > 0;
+            } catch {
+              return false;
+            }
+          };
+
+          const changedPackages = [];
+
+          for (const pkg of packages) {
+            const baseVersion = readVersionAtRef(base, pkg.packageJsonPath);
+            const headVersion = readVersionAtRef(head, pkg.packageJsonPath);
+            const versionChanged = Boolean(headVersion) && headVersion !== baseVersion;
+            const filesChanged = packageFilesChanged(base, head, pkg.directoryPath);
+            const packageChanged = versionChanged || filesChanged;
+
+            console.log(`${pkg.name}: version ${baseVersion} -> ${headVersion} (versionChanged=${versionChanged}, filesChanged=${filesChanged}, changed=${packageChanged})`);
+
+            if (packageChanged) {
+              changedPackages.push(pkg.name);
+            }
+          }
+
+          fs.appendFileSync(outputFile, `changed=${changedPackages.join(',')}\n`);
+          fs.appendFileSync(outputFile, `has_changes=${changedPackages.length > 0}\n`);
+          NODE
+
+      - name: Report detected package changes
+        run: |
+          if [ "${{ steps.detect.outputs.has_changes }}" = "true" ]; then
+            echo "Detected package changes: ${{ steps.detect.outputs.changed }}"
+            {
+              echo "## Pre-publish check"
+              echo "Detected package changes: ${{ steps.detect.outputs.changed }}"
+              echo "No publish is performed in this workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No package changes detected."
+            {
+              echo "## Pre-publish check"
+              echo "No package changes detected."
+              echo "No publish is performed in this workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
