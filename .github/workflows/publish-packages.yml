@@ -62,6 +62,15 @@ jobs:
             }
           };
 
+          const readNpmLatestVersion = (packageName) => {
+            try {
+              const version = execSync(`npm view "${packageName}" version`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+              return version || null;
+            } catch {
+              return null;
+            }
+          };
+
           const packageFilesChanged = (baseRef, headRef, directoryPath) => {
             try {
               const output = execSync(`git diff --name-only ${baseRef} ${headRef} -- ${directoryPath}`, { encoding: 'utf8' }).trim();
@@ -76,11 +85,13 @@ jobs:
           for (const pkg of packages) {
             const baseVersion = readVersionAtRef(base, pkg.packageJsonPath);
             const headVersion = readVersionAtRef(head, pkg.packageJsonPath);
+            const npmLatestVersion = readNpmLatestVersion(pkg.name);
             const versionChanged = Boolean(headVersion) && headVersion !== baseVersion;
             const filesChanged = packageFilesChanged(base, head, pkg.directoryPath);
-            const packageChanged = versionChanged || filesChanged;
+            const npmVersionChanged = Boolean(headVersion) && (npmLatestVersion === null || headVersion !== npmLatestVersion);
+            const packageChanged = versionChanged || filesChanged || npmVersionChanged;
 
-            console.log(`${pkg.name}: version ${baseVersion} -> ${headVersion} (versionChanged=${versionChanged}, filesChanged=${filesChanged}, changed=${packageChanged})`);
+            console.log(`${pkg.name}: version ${baseVersion} -> ${headVersion}, npmLatest=${npmLatestVersion} (versionChanged=${versionChanged}, filesChanged=${filesChanged}, npmVersionChanged=${npmVersionChanged}, changed=${packageChanged})`);
 
             if (packageChanged) {
               changedPackages.push(pkg.name);
