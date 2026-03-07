@@ -25,7 +25,7 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - name: Detect package version changes
+      - name: Detect package changes
         id: detect
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -40,8 +40,16 @@ jobs:
           const outputFile = process.env.GITHUB_OUTPUT;
 
           const packages = [
-            { name: '@bfme-technology/styled', path: '@bfme-technology/styled/package.json' },
-            { name: '@bfme-technology/spa', path: '@bfme-technology/spa/package.json' },
+            {
+              name: '@bfme-technology/styled',
+              packageJsonPath: '@bfme-technology/styled/package.json',
+              directoryPath: '@bfme-technology/styled/',
+            },
+            {
+              name: '@bfme-technology/spa',
+              packageJsonPath: '@bfme-technology/spa/package.json',
+              directoryPath: '@bfme-technology/spa/',
+            },
           ];
 
           const readVersionAtRef = (ref, filePath) => {
@@ -54,16 +62,27 @@ jobs:
             }
           };
 
+          const packageFilesChanged = (baseRef, headRef, directoryPath) => {
+            try {
+              const output = execSync(`git diff --name-only ${baseRef} ${headRef} -- ${directoryPath}`, { encoding: 'utf8' }).trim();
+              return output.length > 0;
+            } catch {
+              return false;
+            }
+          };
+
           const changedPackages = [];
 
           for (const pkg of packages) {
-            const baseVersion = readVersionAtRef(base, pkg.path);
-            const headVersion = readVersionAtRef(head, pkg.path);
+            const baseVersion = readVersionAtRef(base, pkg.packageJsonPath);
+            const headVersion = readVersionAtRef(head, pkg.packageJsonPath);
             const versionChanged = Boolean(headVersion) && headVersion !== baseVersion;
+            const filesChanged = packageFilesChanged(base, head, pkg.directoryPath);
+            const packageChanged = versionChanged || filesChanged;
 
-            console.log(`${pkg.name}: ${baseVersion} -> ${headVersion} (changed=${versionChanged})`);
+            console.log(`${pkg.name}: version ${baseVersion} -> ${headVersion} (versionChanged=${versionChanged}, filesChanged=${filesChanged}, changed=${packageChanged})`);
 
-            if (versionChanged) {
+            if (packageChanged) {
               changedPackages.push(pkg.name);
             }
           }
@@ -72,9 +91,9 @@ jobs:
           fs.appendFileSync(outputFile, `has_changes=${changedPackages.length > 0}\n`);
           NODE
 
-      - name: Skip publish when no package versions changed
+      - name: Skip publish when no package changes detected
         if: steps.detect.outputs.has_changes != 'true'
-        run: echo "No package version changes detected. Skipping publish."
+        run: echo "No package changes detected. Skipping publish."
 
       - name: Publish @bfme-technology/styled
         if: contains(steps.detect.outputs.changed, '@bfme-technology/styled')
@@ -84,6 +103,13 @@ jobs:
           VERSION=$(node -p "require('./@bfme-technology/styled/package.json').version")
           if npm view "@bfme-technology/styled@${VERSION}" version >/dev/null 2>&1; then
             echo "@bfme-technology/styled@${VERSION} already exists on npm. Skipping."
+            exit 0
+          fi
+
+          LOCAL_SHA=$(cd @bfme-technology/styled && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
+          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/styled@latest" dist.shasum 2>/dev/null || true)
+          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
+            echo "@bfme-technology/styled content matches npm latest. Skipping publish."
             exit 0
           fi
 
@@ -98,6 +124,13 @@ jobs:
           VERSION=$(node -p "require('./@bfme-technology/spa/package.json').version")
           if npm view "@bfme-technology/spa@${VERSION}" version >/dev/null 2>&1; then
             echo "@bfme-technology/spa@${VERSION} already exists on npm. Skipping."
+            exit 0
+          fi
+
+          LOCAL_SHA=$(cd @bfme-technology/spa && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
+          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/spa@latest" dist.shasum 2>/dev/null || true)
+          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
+            echo "@bfme-technology/spa content matches npm latest. Skipping publish."
             exit 0
           fi
 
