@@ -49,3 +49,47 @@ export declare const gridFilterSelectClass: string;
 export declare const gridPrimaryButtonClass: string;
 export declare const gridContentSectionClass: string;
 export declare const gridEmptyTextClass: string;
+
+export type ThemeStyles = {
+  layoutWrapperClass: string;
+  getSidebarClass: (args: { isCollapsed: boolean; isOpen: boolean }) => string;
+  logoAdminClass: string;
+  navClass: string;
+  getLayoutNavLinkClass: (args: { isActive: boolean }) => string;
+  navIconClass: string;
+  navLinkTextClass: string;
+  layoutMainClass: string;
+  topbarClass: string;
+  topbarTitleClass: string;
+  themeToggleContainerClass: string;
+  getThemeToggleButtonClass: (args: { isActive: boolean }) => string;
+  contentAreaClass: string;
+  breadcrumbContainerClass: string;
+  breadcrumbListClass: string;
+  breadcrumbItemClass: string;
+  breadcrumbLinkClass: string;
+  breadcrumbActiveItemClass: string;
+  breadcrumbSeparatorClass: string;
+  dashboardContainerClass: string;
+  dashboardRootClass: string;
+  dashboardTitleClass: string;
+  metricsGridClass: string;
+  metricCardClass: string;
+  metricCardTitleClass: string;
+  metricValueClass: string;
+  gridContainerClass: string;
+  gridPageWrapperClass: string;
+  gridHeaderSectionClass: string;
+  gridHeaderTitleClass: string;
+  gridActionsSectionClass: string;
+  gridFilterSectionClass: string;
+  gridFilterLabelClass: string;
+  gridFilterSelectClass: string;
+  gridPrimaryButtonClass: string;
+  gridContentSectionClass: string;
+  gridEmptyTextClass: string;
+};
+
+export declare const freyja: ThemeStyles;
+export declare const mercury: ThemeStyles;
+
