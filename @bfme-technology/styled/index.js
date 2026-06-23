@@ -42,3 +42,10 @@ export {
   gridContentSectionClass,
   gridEmptyTextClass,
 } from "./src/studioAdminStyles.js";
+
+import * as freyjaStyles from "./src/studioAdminStyles.js";
+import * as mercuryStyles from "./src/themes/mercury.js";
+
+export const freyja = freyjaStyles;
+export const mercury = mercuryStyles;
+
