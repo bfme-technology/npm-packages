@@ -23,7 +23,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org
+
+      - name: Install latest npm
+        run: npm install -g npm@latest
 
       - name: Detect package changes
         id: detect
@@ -113,8 +115,6 @@ jobs:
 
       - name: Publish @bfme-technology/styled
         if: contains(steps.detect.outputs.changed, '@bfme-technology/styled')
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VERSION=$(node -p "require('./@bfme-technology/styled/package.json').version")
           if npm view "@bfme-technology/styled@${VERSION}" version >/dev/null 2>&1; then
@@ -134,8 +134,6 @@ jobs:
 
       - name: Publish @bfme-technology/spa
         if: contains(steps.detect.outputs.changed, '@bfme-technology/spa')
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VERSION=$(node -p "require('./@bfme-technology/spa/package.json').version")
           if npm view "@bfme-technology/spa@${VERSION}" version >/dev/null 2>&1; then
@@ -155,8 +153,6 @@ jobs:
 
       - name: Publish @bfme-technology/grid
         if: contains(steps.detect.outputs.changed, '@bfme-technology/grid')
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VERSION=$(node -p "require('./@bfme-technology/grid/package.json').version")
           if npm view "@bfme-technology/grid@${VERSION}" version >/dev/null 2>&1; then
