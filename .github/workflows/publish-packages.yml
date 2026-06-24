@@ -27,6 +27,9 @@ jobs:
       - name: Install latest npm
         run: npm install -g npm@latest
 
+      - name: Clean npm auth config
+        run: rm -f ~/.npmrc .npmrc
+
       - name: Detect package changes
         id: detect
         env:
@@ -130,7 +133,7 @@ jobs:
           fi
 
           cd @bfme-technology/styled
-          npm publish --access public --provenance
+          npx -y npm@latest publish --access public --provenance
 
       - name: Publish @bfme-technology/spa
         if: contains(steps.detect.outputs.changed, '@bfme-technology/spa')
@@ -149,7 +152,7 @@ jobs:
           fi
 
           cd @bfme-technology/spa
-          npm publish --access public --provenance
+          npx -y npm@latest publish --access public --provenance
 
       - name: Publish @bfme-technology/grid
         if: contains(steps.detect.outputs.changed, '@bfme-technology/grid')
@@ -168,4 +171,4 @@ jobs:
           fi
 
           cd @bfme-technology/grid
-          npm publish --access public --provenance
+          npx -y npm@latest publish --access public --provenance
