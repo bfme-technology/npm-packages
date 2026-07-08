@@ -198,10 +198,8 @@ import React2 from "react";
 import ReactDOM from "react-dom";
 var loadedScripts = /* @__PURE__ */ new Set();
 var loadedStylesheets = /* @__PURE__ */ new Set();
-var initHostShareScopes = () => {
+var registerShare = (name, version, module, from = "@bfme-technology/spa") => {
   const win = window;
-  win.React = React2;
-  win.ReactDOM = ReactDOM;
   if (!win.__webpack_share_scopes__) {
     win.__webpack_share_scopes__ = {};
   }
@@ -209,17 +207,20 @@ var initHostShareScopes = () => {
     win.__webpack_share_scopes__.default = {};
   }
   const defaultScope = win.__webpack_share_scopes__.default;
-  const registerShare = (name, version, module) => {
-    if (!defaultScope[name]) {
-      defaultScope[name] = {
-        [version]: {
-          get: () => Promise.resolve(() => module),
-          loaded: 1,
-          from: "@bfme-technology/spa"
-        }
-      };
-    }
-  };
+  if (!defaultScope[name]) {
+    defaultScope[name] = {
+      [version]: {
+        get: () => Promise.resolve(() => module),
+        loaded: 1,
+        from
+      }
+    };
+  }
+};
+var initHostShareScopes = () => {
+  const win = window;
+  win.React = React2;
+  win.ReactDOM = ReactDOM;
   registerShare("react", "19.2.6", React2);
   registerShare("react-dom", "19.2.6", ReactDOM);
 };
@@ -559,6 +560,9 @@ var FederatedModule = (props) => {
 var FederatedModule_default = FederatedModule;
 export {
   FederatedModule_default as FederatedModule,
-  focusAreaLoadElement_default as FocusAreaLoadElement
+  focusAreaLoadElement_default as FocusAreaLoadElement,
+  initHostShareScopes,
+  registerShare,
+  useMfeLoader
 };
 //# sourceMappingURL=index.js.map
