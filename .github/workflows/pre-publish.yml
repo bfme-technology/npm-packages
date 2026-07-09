@@ -28,96 +28,12 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          node <<'NODE'
-          const { execSync } = require('child_process');
-          const fs = require('fs');
-
-          const base = process.env.BASE_SHA;
-          const head = process.env.HEAD_SHA;
-          const outputFile = process.env.GITHUB_OUTPUT;
-
-          const packages = [
-            {
-              name: '@bfme-technology/styled',
-              packageJsonPath: '@bfme-technology/styled/package.json',
-              directoryPath: '@bfme-technology/styled/',
-            },
-            {
-              name: '@bfme-technology/spa',
-              packageJsonPath: '@bfme-technology/spa/package.json',
-              directoryPath: '@bfme-technology/spa/',
-            },
-            {
-              name: '@bfme-technology/grid',
-              packageJsonPath: '@bfme-technology/grid/package.json',
-              directoryPath: '@bfme-technology/grid/',
-            },
-          ];
-
-          const readVersionAtRef = (ref, filePath) => {
-            try {
-              const content = execSync(`git show ${ref}:${filePath}`, { encoding: 'utf8' });
-              const parsed = JSON.parse(content);
-              return parsed.version ?? null;
-            } catch {
-              return null;
-            }
-          };
-
-          const readNpmLatestVersion = (packageName) => {
-            try {
-              const version = execSync(`npm view "${packageName}" version`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-              return version || null;
-            } catch {
-              return null;
-            }
-          };
-
-          const packageFilesChanged = (baseRef, headRef, directoryPath) => {
-            try {
-              const output = execSync(`git diff --name-only ${baseRef} ${headRef} -- ${directoryPath}`, { encoding: 'utf8' }).trim();
-              return output.length > 0;
-            } catch {
-              return false;
-            }
-          };
-
-          const changedPackages = [];
-
-          for (const pkg of packages) {
-            const baseVersion = readVersionAtRef(base, pkg.packageJsonPath);
-            const headVersion = readVersionAtRef(head, pkg.packageJsonPath);
-            const npmLatestVersion = readNpmLatestVersion(pkg.name);
-            const versionChanged = Boolean(headVersion) && headVersion !== baseVersion;
-            const filesChanged = packageFilesChanged(base, head, pkg.directoryPath);
-            const npmVersionChanged = Boolean(headVersion) && (npmLatestVersion === null || headVersion !== npmLatestVersion);
-            const packageChanged = versionChanged || filesChanged || npmVersionChanged;
-
-            console.log(`${pkg.name}: version ${baseVersion} -> ${headVersion}, npmLatest=${npmLatestVersion} (versionChanged=${versionChanged}, filesChanged=${filesChanged}, npmVersionChanged=${npmVersionChanged}, changed=${packageChanged})`);
-
-            if (packageChanged) {
-              changedPackages.push(pkg.name);
-            }
-          }
-
-          fs.appendFileSync(outputFile, `changed=${changedPackages.join(',')}\n`);
-          fs.appendFileSync(outputFile, `has_changes=${changedPackages.length > 0}\n`);
-          NODE
+          node .github/scripts/ci-helper.js detect --base "$BASE_SHA" --head "$HEAD_SHA"
 
       - name: Report detected package changes
         run: |
           if [ "${{ steps.detect.outputs.has_changes }}" = "true" ]; then
             echo "Detected package changes: ${{ steps.detect.outputs.changed }}"
-            {
-              echo "## Pre-publish check"
-              echo "Detected package changes: ${{ steps.detect.outputs.changed }}"
-              echo "No publish is performed in this workflow."
-            } >> "$GITHUB_STEP_SUMMARY"
           else
             echo "No package changes detected."
-            {
-              echo "## Pre-publish check"
-              echo "No package changes detected."
-              echo "No publish is performed in this workflow."
-            } >> "$GITHUB_STEP_SUMMARY"
           fi

@@ -25,9 +25,6 @@ jobs:
         with:
           node-version: "26"
 
-      - name: Install latest npm
-        run: npm install -g npm@latest
-
       - name: Clean npm auth config
         run: rm -f ~/.npmrc .npmrc
 
@@ -37,139 +34,9 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
         run: |
-          node <<'NODE'
-          const { execSync } = require('child_process');
-          const fs = require('fs');
+          node .github/scripts/ci-helper.js detect --base "$BASE_SHA" --head "$HEAD_SHA"
 
-          const base = process.env.BASE_SHA;
-          const head = process.env.HEAD_SHA;
-          const outputFile = process.env.GITHUB_OUTPUT;
-
-          const packages = [
-            {
-              name: '@bfme-technology/styled',
-              packageJsonPath: '@bfme-technology/styled/package.json',
-              directoryPath: '@bfme-technology/styled/',
-            },
-            {
-              name: '@bfme-technology/spa',
-              packageJsonPath: '@bfme-technology/spa/package.json',
-              directoryPath: '@bfme-technology/spa/',
-            },
-            {
-              name: '@bfme-technology/grid',
-              packageJsonPath: '@bfme-technology/grid/package.json',
-              directoryPath: '@bfme-technology/grid/',
-            },
-          ];
-
-          const readVersionAtRef = (ref, filePath) => {
-            try {
-              const content = execSync(`git show ${ref}:${filePath}`, { encoding: 'utf8' });
-              const parsed = JSON.parse(content);
-              return parsed.version ?? null;
-            } catch {
-              return null;
-            }
-          };
-
-          const readNpmLatestVersion = (packageName) => {
-            try {
-              const version = execSync(`npm view "${packageName}" version`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-              return version || null;
-            } catch {
-              return null;
-            }
-          };
-
-          const packageFilesChanged = (baseRef, headRef, directoryPath) => {
-            try {
-              const output = execSync(`git diff --name-only ${baseRef} ${headRef} -- ${directoryPath}`, { encoding: 'utf8' }).trim();
-              return output.length > 0;
-            } catch {
-              return false;
-            }
-          };
-
-          const changedPackages = [];
-
-          for (const pkg of packages) {
-            const baseVersion = readVersionAtRef(base, pkg.packageJsonPath);
-            const headVersion = readVersionAtRef(head, pkg.packageJsonPath);
-            const npmLatestVersion = readNpmLatestVersion(pkg.name);
-            const versionChanged = Boolean(headVersion) && headVersion !== baseVersion;
-            const filesChanged = packageFilesChanged(base, head, pkg.directoryPath);
-            const npmVersionChanged = Boolean(headVersion) && (npmLatestVersion === null || headVersion !== npmLatestVersion);
-            const packageChanged = versionChanged || filesChanged || npmVersionChanged;
-
-            console.log(`${pkg.name}: version ${baseVersion} -> ${headVersion}, npmLatest=${npmLatestVersion} (versionChanged=${versionChanged}, filesChanged=${filesChanged}, npmVersionChanged=${npmVersionChanged}, changed=${packageChanged})`);
-
-            if (packageChanged) {
-              changedPackages.push(pkg.name);
-            }
-          }
-
-          fs.appendFileSync(outputFile, `changed=${changedPackages.join(',')}\n`);
-          fs.appendFileSync(outputFile, `has_changes=${changedPackages.length > 0}\n`);
-          NODE
-
-      - name: Skip publish when no package changes detected
-        if: steps.detect.outputs.has_changes != 'true'
-        run: echo "No package changes detected. Skipping publish."
-
-      - name: Publish @bfme-technology/styled
-        if: contains(steps.detect.outputs.changed, '@bfme-technology/styled')
+      - name: Publish changed packages
+        if: steps.detect.outputs.has_changes == 'true'
         run: |
-          VERSION=$(node -p "require('./@bfme-technology/styled/package.json').version")
-          if npm view "@bfme-technology/styled@${VERSION}" version >/dev/null 2>&1; then
-            echo "@bfme-technology/styled@${VERSION} already exists on npm. Skipping."
-            exit 0
-          fi
-
-          LOCAL_SHA=$(cd @bfme-technology/styled && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
-          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/styled@latest" dist.shasum 2>/dev/null || true)
-          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
-            echo "@bfme-technology/styled content matches npm latest. Skipping publish."
-            exit 0
-          fi
-
-          cd @bfme-technology/styled
-          npm publish --access public
-
-      - name: Publish @bfme-technology/spa
-        if: contains(steps.detect.outputs.changed, '@bfme-technology/spa')
-        run: |
-          VERSION=$(node -p "require('./@bfme-technology/spa/package.json').version")
-          if npm view "@bfme-technology/spa@${VERSION}" version >/dev/null 2>&1; then
-            echo "@bfme-technology/spa@${VERSION} already exists on npm. Skipping."
-            exit 0
-          fi
-
-          LOCAL_SHA=$(cd @bfme-technology/spa && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
-          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/spa@latest" dist.shasum 2>/dev/null || true)
-          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
-            echo "@bfme-technology/spa content matches npm latest. Skipping publish."
-            exit 0
-          fi
-
-          cd @bfme-technology/spa
-          npm publish --access public
-
-      - name: Publish @bfme-technology/grid
-        if: contains(steps.detect.outputs.changed, '@bfme-technology/grid')
-        run: |
-          VERSION=$(node -p "require('./@bfme-technology/grid/package.json').version")
-          if npm view "@bfme-technology/grid@${VERSION}" version >/dev/null 2>&1; then
-            echo "@bfme-technology/grid@${VERSION} already exists on npm. Skipping."
-            exit 0
-          fi
-
-          LOCAL_SHA=$(cd @bfme-technology/grid && npm pack --json --silent | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data[0]?.shasum || "");')
-          REMOTE_LATEST_SHA=$(npm view "@bfme-technology/grid@latest" dist.shasum 2>/dev/null || true)
-          if [ -n "$REMOTE_LATEST_SHA" ] && [ "$LOCAL_SHA" = "$REMOTE_LATEST_SHA" ]; then
-            echo "@bfme-technology/grid content matches npm latest. Skipping publish."
-            exit 0
-          fi
-
-          cd @bfme-technology/grid
-          npm publish --access public
+          node .github/scripts/ci-helper.js publish --changed "${{ steps.detect.outputs.changed }}"
