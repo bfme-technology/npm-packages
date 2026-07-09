@@ -1,5 +1,5 @@
 export const layoutWrapperClass =
-  "flex h-screen overflow-hidden bg-bg-deep text-text-primary font-sans selection:bg-cyan-500/30 selection:text-cyan-200";
+  "flex h-screen overflow-hidden bg-bg-deep text-text-primary font-sans selection:bg-teal-500/30 selection:text-teal-200";
 
 export const getSidebarClass = ({ isCollapsed, isOpen }) =>
   [
@@ -16,7 +16,7 @@ export const getLayoutNavLinkClass = ({ isActive }) =>
   [
     "flex items-center rounded-2xl text-sm font-medium transition-all duration-300 pl-2 pr-4 py-2.5",
     isActive
-      ? "bg-primary-accent-bg text-primary-accent border-l-4 border-primary-accent font-semibold shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+      ? "bg-primary-accent-bg text-primary-accent border-l-4 border-primary-accent font-semibold shadow-[0_0_15px_rgba(13,148,136,0.15)]"
       : "text-text-secondary hover:text-text-primary hover:bg-bg-surface/40",
   ].join(" ");
 
@@ -70,7 +70,7 @@ export const metricsGridClass =
   "grid grid-cols-1 gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3";
 
 export const metricCardClass =
-  "rounded-2xl border border-border-color bg-bg-surface/60 p-5 md:p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-primary-accent/20 hover:shadow-cyan-950/20";
+  "rounded-2xl border border-border-color bg-bg-surface/60 p-5 md:p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-primary-accent/20 hover:shadow-teal-950/20";
 
 export const metricCardTitleClass =
   "text-[11px] font-bold text-text-secondary tracking-wider uppercase";
