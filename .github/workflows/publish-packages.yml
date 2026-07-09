@@ -134,7 +134,7 @@ jobs:
           fi
 
           cd @bfme-technology/styled
-          npm publish --access public --provenance
+          npm publish --access public
 
       - name: Publish @bfme-technology/spa
         if: contains(steps.detect.outputs.changed, '@bfme-technology/spa')
@@ -153,7 +153,7 @@ jobs:
           fi
 
           cd @bfme-technology/spa
-          npm publish --access public --provenance
+          npm publish --access public
 
       - name: Publish @bfme-technology/grid
         if: contains(steps.detect.outputs.changed, '@bfme-technology/grid')
@@ -172,4 +172,4 @@ jobs:
           fi
 
           cd @bfme-technology/grid
-          npm publish --access public --provenance
+          npm publish --access public
