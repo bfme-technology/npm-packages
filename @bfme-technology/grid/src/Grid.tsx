@@ -238,16 +238,12 @@ const Grid = (props) => {
     if (col.cellRenderer) {
       const CellRenderer = col.cellRenderer;
       if (typeof CellRenderer === "function") {
-        try {
-          return React.createElement(CellRenderer, {
-            value,
-            data: row,
-            node: { id: index },
-            ...(col.cellRendererParams || {}),
-          });
-        } catch (e) {
-          return CellRenderer({ value, data: row, ...(col.cellRendererParams || {}) });
-        }
+        return CellRenderer({
+          value,
+          data: row,
+          node: { id: index },
+          ...(col.cellRendererParams || {}),
+        });
       }
     }
     return value !== undefined && value !== null ? String(value) : "";
