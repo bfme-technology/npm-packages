@@ -7,7 +7,7 @@ import {
   paginationContainerClass,
   paginationControlsClass,
   paginationInfoClass,
-} from "./styles.js";
+} from "./styles";
 
 const getPaginationData = (paginatorInfo) => {
   if (!paginatorInfo) return null;

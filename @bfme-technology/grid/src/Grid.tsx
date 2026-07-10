@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import Pagination from "./Pagination.js";
+import Pagination from "./Pagination";
 import {
   gridWrapperClass,
   gridContainerClass,
@@ -15,7 +15,7 @@ import {
   expandButtonClass,
   expandableRowClass,
   expandableRowCellClass,
-} from "./styles.js";
+} from "./styles";
 
 // Helper to determine the theme mode
 const getSystemTheme = () => {
