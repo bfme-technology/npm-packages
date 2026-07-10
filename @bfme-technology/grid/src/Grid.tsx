@@ -65,7 +65,8 @@ const Grid = (props) => {
     rowData = [],
     columnDefs = [],
     loading = false,
-    pagination = false,
+    pagination = true,
+    paginate = true,
     paginationPageSize = 10,
     paginatorInfo,
     onPageChange,
@@ -76,6 +77,8 @@ const Grid = (props) => {
     containerStyle,
     themeMode = "auto",
   } = props;
+
+  const isPaginationEnabled = pagination && paginate;
 
   const [resolvedTheme, setResolvedTheme] = useState(() => getResolvedTheme(themeMode));
 
@@ -205,29 +208,29 @@ const Grid = (props) => {
 
   // Determine current active page rows for client-side pagination
   const activeRows = useMemo(() => {
-    if (isServerSide || !pagination) return rowData;
+    if (isServerSide || !isPaginationEnabled) return rowData;
     const start = (localPage - 1) * paginationPageSize;
     return rowData.slice(start, start + paginationPageSize);
-  }, [rowData, pagination, paginationPageSize, localPage, isServerSide]);
+  }, [rowData, isPaginationEnabled, paginationPageSize, localPage, isServerSide]);
 
   // Active groups if client-side paginated
   const activeGroups = useMemo(() => {
     if (!groupBy || !groups) return null;
-    if (isServerSide || !pagination) return groups;
+    if (isServerSide || !isPaginationEnabled) return groups;
     
     // Paginate grouped rows
     const start = (localPage - 1) * paginationPageSize;
     const end = start + paginationPageSize;
     const slicedRowData = rowData.slice(start, end);
 
-    const g = {};
+    const g: any = {};
     slicedRowData.forEach((row, index) => {
       const val = row[groupBy] !== undefined && row[groupBy] !== null ? String(row[groupBy]) : "None";
       if (!g[val]) g[val] = [];
       g[val].push({ row, index: start + index });
     });
     return g;
-  }, [rowData, groups, groupBy, pagination, paginationPageSize, localPage, isServerSide]);
+  }, [rowData, groups, groupBy, isPaginationEnabled, paginationPageSize, localPage, isServerSide]);
 
   // Handle cell rendering
   const renderCell = (col, row, index) => {
@@ -253,14 +256,14 @@ const Grid = (props) => {
   // Build pagination props
   const resolvedPaginatorInfo = useMemo(() => {
     if (isServerSide) return paginatorInfo;
-    if (!pagination) return null;
+    if (!isPaginationEnabled) return null;
     return {
       currentPage: localPage,
       lastPage: Math.ceil(rowData.length / paginationPageSize) || 1,
       total: rowData.length,
       perPage: paginationPageSize,
     };
-  }, [rowData, pagination, paginationPageSize, localPage, isServerSide, paginatorInfo]);
+  }, [rowData, isPaginationEnabled, paginationPageSize, localPage, isServerSide, paginatorInfo]);
 
   const handlePageChange = (page) => {
     if (isServerSide) {

@@ -24,6 +24,7 @@ export type GridProps = {
   loading?: boolean;
   themeMode?: "auto" | "light" | "dark";
   pagination?: boolean;
+  paginate?: boolean;
   paginationPageSize?: number;
   paginatorInfo?: PaginatorInfo;
   onPageChange?: (page: number) => void;
