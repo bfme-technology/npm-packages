@@ -1,7 +1,7 @@
 export { default as Grid } from "./src/Grid.js";
 export { default } from "./src/Grid.js";
 export { default as Pagination } from "./src/Pagination.js";
-export { createGridConfig } from "./src/gridConfig.js";
+export const createGridConfig = (props) => props;
 export {
   gridContainerClass,
   gridWrapperClass,

@@ -20,8 +20,6 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18",
-    "ag-grid-community": ">=35",
-    "ag-grid-react": ">=35"
+    "react-dom": ">=18"
   }
 }
