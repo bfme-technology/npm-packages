@@ -1,6 +1,6 @@
 {
   "name": "@bfme-technology/grid",
-  "version": "0.1.0",
+  "version": "0.1.1-alpha-3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bfme-technology/npm-packages.git"
@@ -20,8 +20,6 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18",
-    "ag-grid-community": ">=35",
-    "ag-grid-react": ">=35"
+    "react-dom": ">=18"
   }
 }

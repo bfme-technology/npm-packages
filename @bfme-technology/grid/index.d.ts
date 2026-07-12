@@ -1,10 +1,4 @@
 import type React from "react";
-import type {
-  ColDef,
-  GridOptions,
-  GridReadyEvent,
-  PaginationChangedEvent,
-} from "ag-grid-community";
 
 export type PaginatorInfo = {
   total: number;
@@ -13,20 +7,30 @@ export type PaginatorInfo = {
   perPage: number;
 };
 
-export type GridProps<RowData = unknown> = {
-  rowData: RowData[];
-  columnDefs: ColDef<RowData>[];
+export type ColumnDef = {
+  headerName?: string;
+  field?: string;
+  cellRenderer?: React.ComponentType<any>;
+  cellRendererParams?: any;
+  children?: ColumnDef[];
+  flex?: number;
+  minWidth?: number;
+  [key: string]: any;
+};
+
+export type GridProps = {
+  rowData: any[];
+  columnDefs: ColumnDef[];
+  loading?: boolean;
   themeMode?: "auto" | "light" | "dark";
-  defaultColDef?: ColDef<RowData>;
-  gridOptions?: GridOptions<RowData>;
   pagination?: boolean;
+  paginate?: boolean;
   paginationPageSize?: number;
-  suppressPaginationPanel?: boolean;
-  onPaginationChanged?: (params: PaginationChangedEvent) => void;
-  onGridReady?: (event: GridReadyEvent<RowData>) => void;
   paginatorInfo?: PaginatorInfo;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
+  groupBy?: string;
+  expandableRowRenderer?: React.ComponentType<{ data: any }>;
   containerClassName?: string;
   containerStyle?: React.CSSProperties;
 };
@@ -42,16 +46,6 @@ export declare const Grid: React.FC<GridProps>;
 export default Grid;
 
 export declare const Pagination: React.FC<PaginationProps>;
-
-export declare const createGridConfig: <RowData = unknown>(
-  props: GridProps<RowData>,
-) => GridProps<RowData> & {
-  pagination: false;
-  domLayout: "normal";
-  suppressNoRowsOverlay: false;
-  overlayNoRowsTemplate: string;
-  defaultColDef: ColDef<RowData>;
-};
 
 export declare const gridWrapperClass: string;
 export declare const gridContainerClass: string;

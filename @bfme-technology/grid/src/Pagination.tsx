@@ -7,7 +7,7 @@ import {
   paginationContainerClass,
   paginationControlsClass,
   paginationInfoClass,
-} from "./styles.js";
+} from "./styles";
 
 const getPaginationData = (paginatorInfo) => {
   if (!paginatorInfo) return null;
@@ -84,8 +84,9 @@ const Pagination = ({
             onChange: handlePageSizeChange,
           },
           React.createElement("option", { value: "10" }, "10"),
-          React.createElement("option", { value: "20" }, "20"),
+          React.createElement("option", { value: "25" }, "25"),
           React.createElement("option", { value: "50" }, "50"),
+          React.createElement("option", { value: "75" }, "75"),
           React.createElement("option", { value: "100" }, "100"),
         ),
       ),
