@@ -204,7 +204,16 @@ function publishPackages(changedArg) {
     // 5. Publish to npm
     console.log(`Publishing ${pkg.name}@${version} to npm...`);
     try {
-      execSync('npm publish --access public', { cwd: dirPath, stdio: 'inherit' });
+      let publishCmd = 'npm publish --access public';
+      const prMatch = version.match(/-([a-zA-Z0-9.-]+)/);
+      if (prMatch) {
+        const matchText = prMatch[1];
+        const alphaMatch = matchText.match(/^([a-zA-Z]+)/);
+        const tag = alphaMatch ? alphaMatch[1] : 'next';
+        publishCmd += ` --tag ${tag}`;
+        console.log(`Prerelease version detected, using tag: ${tag}`);
+      }
+      execSync(publishCmd, { cwd: dirPath, stdio: 'inherit' });
       console.log(`[SUCCESS] Published ${pkg.name}@${version}`);
     } catch (err) {
       console.error(`[ERROR] Publish failed for ${pkg.name}`);
