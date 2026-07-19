@@ -24,6 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "26"
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Clean npm auth config
         run: rm -f ~/.npmrc .npmrc
@@ -38,5 +39,7 @@ jobs:
 
       - name: Publish changed packages
         if: steps.detect.outputs.has_changes == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           node .github/scripts/ci-helper.js publish --changed "${{ steps.detect.outputs.changed }}"
