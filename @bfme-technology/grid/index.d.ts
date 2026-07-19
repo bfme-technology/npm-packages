@@ -33,6 +33,7 @@ export type GridProps = {
   expandableRowRenderer?: React.ComponentType<{ data: any }>;
   containerClassName?: string;
   containerStyle?: React.CSSProperties;
+  mobileCardRenderer?: (props: { data: any; index: number }) => React.ReactNode;
 };
 
 export type PaginationProps = {
