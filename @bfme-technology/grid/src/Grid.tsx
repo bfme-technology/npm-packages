@@ -76,7 +76,6 @@ const Grid = (props) => {
     containerClassName,
     containerStyle,
     themeMode = "auto",
-    mobileCardRenderer,
   } = props;
 
   const isPaginationEnabled = pagination && paginate;
@@ -359,7 +358,7 @@ const Grid = (props) => {
     React.createElement(
       "div",
       {
-        className: `${gridContainerClass} ${containerClassName || ""} ${mobileCardRenderer ? "hidden sm:block" : ""}`,
+        className: `${gridContainerClass} ${containerClassName || ""}`,
         style: themeStyle,
       },
       React.createElement(
@@ -422,43 +421,9 @@ const Grid = (props) => {
                   </React.Fragment>
                 );
               })
-          : activeRows.map((row, index) => renderRow(row, index))
+            : activeRows.map((row, index) => renderRow(row, index))
         )
       )
-    ),
-    mobileCardRenderer && React.createElement(
-      "div",
-      { className: "block sm:hidden flex flex-col gap-3 mt-2" },
-      loading
-        ? React.createElement("div", { className: "text-center text-text-muted text-xs py-4" }, "Loading...")
-        : groupBy && activeGroups
-        ? Object.keys(activeGroups).map((groupKey) => {
-            const isGroupOpen = expandedGroups.has(groupKey);
-            const groupItems = activeGroups[groupKey];
-            return React.createElement(
-              React.Fragment,
-              { key: groupKey },
-              React.createElement(
-                "div",
-                {
-                  className: "px-4 py-2 bg-white/5 font-bold rounded-lg text-sm text-text-primary cursor-pointer flex justify-between items-center",
-                  onClick: () => toggleGroup(groupKey),
-                },
-                React.createElement("span", null, `${groupBy.charAt(0).toUpperCase() + groupBy.slice(1)}: ${groupKey} (${groupItems.length})`),
-                React.createElement("i", { className: `fa-solid ${isGroupOpen ? "fa-chevron-down" : "fa-chevron-right"} text-xs text-text-muted` })
-              ),
-              isGroupOpen && React.createElement(
-                "div",
-                { className: "flex flex-col gap-3 mt-2" },
-                groupItems.map(({ row, index }) => React.createElement(React.Fragment, { key: row.id || row.expense_id || String(index) }, mobileCardRenderer({ data: row, index })))
-              )
-            );
-          })
-        : activeRows.map((row, index) => React.createElement(
-            React.Fragment,
-            { key: row.id || row.expense_id || String(index) },
-            mobileCardRenderer({ data: row, index })
-          ))
     ),
     !loading && resolvedPaginatorInfo &&
       React.createElement(Pagination, {
