@@ -9,13 +9,13 @@ export const theadClass = "bg-bg-elevated border-b border-border-color";
 
 export const thClass = "px-6 py-3 text-xs font-extrabold text-text-secondary tracking-wider uppercase select-none";
 
-export const tbodyClass = "divide-y divide-border-color/40";
+export const tbodyClass = "divide-y divide-border-color";
 
 export const trClass = "hover:bg-bg-deep/40 transition-colors";
 
 export const tdClass = "px-6 py-4 text-sm text-text-primary whitespace-nowrap";
 
-export const groupHeaderRowClass = "bg-bg-elevated/60 font-extrabold text-xs text-text-secondary border-b border-border-color/60 hover:bg-bg-elevated transition-colors cursor-pointer";
+export const groupHeaderRowClass = "bg-bg-elevated/60 font-extrabold text-xs text-text-secondary border-b border-border-color hover:bg-bg-elevated transition-colors cursor-pointer";
 
 export const groupHeaderCellClass = "px-6 py-3 text-left";
 
@@ -23,7 +23,7 @@ export const expandCellClass = "w-10 px-4 text-center select-none";
 
 export const expandButtonClass = "text-text-secondary hover:text-text-primary transition-colors focus:outline-none p-1 cursor-pointer";
 
-export const expandableRowClass = "bg-bg-deep/20 border-b border-border-color/20";
+export const expandableRowClass = "bg-bg-deep/20 border-b border-border-color";
 
 export const expandableRowCellClass = "px-8 py-4 text-sm text-text-secondary whitespace-normal";
 
