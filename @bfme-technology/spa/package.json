@@ -1,6 +1,6 @@
 {
   "name": "@bfme-technology/spa",
-  "version": "0.1.6-alpha.0",
+  "version": "0.1.7-alpha.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bfme-technology/npm-packages.git"

@@ -19,7 +19,7 @@ export const Page: React.FC<PageProps> = ({
   className = "",
 }) => {
   return (
-    <div className={`flex flex-col gap-6 font-body text-text-primary ${className}`}>
+    <div className={`glass-panel p-4 md:p-6 min-h-100 flex flex-col gap-6 font-body text-text-primary ${className}`}>
       <Breadcrumb />
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
