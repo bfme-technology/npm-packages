@@ -38,7 +38,7 @@ export const Page: React.FC<PageProps> = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col gap-4">
+      <div className="flex-grow flex flex-col gap-4 overflow-y-auto">
         {children}
       </div>
     </div>
