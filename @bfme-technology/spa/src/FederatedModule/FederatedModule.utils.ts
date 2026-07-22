@@ -5,6 +5,9 @@ import type { MfeType } from './FederatedModule.types';
 // Keep track of loaded script/css resources globally to prevent duplicates
 export const loadedScripts = new Set<string>();
 export const loadedStylesheets = new Set<string>();
+const pendingScripts = new Map<string, Promise<void>>();
+const pendingStylesheets = new Map<string, Promise<void>>();
+
 export const registerShare = (name: string, version: string, module: any, from = '@bfme-technology/spa') => {
   const win = window as any;
   if (!win.__webpack_share_scopes__) {
@@ -39,20 +42,16 @@ export const initHostShareScopes = () => {
 
 // Helper: Dynamically load a script
 export const loadScript = (url: string, mfeType: MfeType): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    if (loadedScripts.has(url)) {
-      resolve();
-      return;
-    }
+  if (loadedScripts.has(url)) return Promise.resolve();
+  if (pendingScripts.has(url)) return pendingScripts.get(url)!;
 
-    // Check if already in DOM
-    const existingScript = document.querySelector(`script[src="${url}"]`);
-    if (existingScript) {
-      loadedScripts.add(url);
-      resolve();
-      return;
-    }
+  const existingScript = document.querySelector(`script[src="${url}"]`);
+  if (existingScript) {
+    loadedScripts.add(url);
+    return Promise.resolve();
+  }
 
+  const loadPromise = new Promise<void>((resolve, reject) => {
     const script = document.createElement('script');
     script.src = url;
     script.async = true;
@@ -60,44 +59,51 @@ export const loadScript = (url: string, mfeType: MfeType): Promise<void> => {
 
     script.onload = () => {
       loadedScripts.add(url);
+      pendingScripts.delete(url);
       resolve();
     };
 
     script.onerror = () => {
+      pendingScripts.delete(url);
       reject(new Error(`Failed to load script: ${url}`));
     };
 
     document.body.appendChild(script);
   });
+
+  pendingScripts.set(url, loadPromise);
+  return loadPromise;
 };
 
 // Helper: Dynamically load a stylesheet
 export const loadStylesheet = (url: string): Promise<void> => {
-  return new Promise((resolve) => {
-    if (loadedStylesheets.has(url)) {
-      resolve();
-      return;
-    }
+  if (loadedStylesheets.has(url)) return Promise.resolve();
+  if (pendingStylesheets.has(url)) return pendingStylesheets.get(url)!;
 
-    const existingLink = document.querySelector(`link[href="${url}"]`);
-    if (existingLink) {
-      loadedStylesheets.add(url);
-      resolve();
-      return;
-    }
+  const existingLink = document.querySelector(`link[href="${url}"]`);
+  if (existingLink) {
+    loadedStylesheets.add(url);
+    return Promise.resolve();
+  }
 
+  const loadPromise = new Promise<void>((resolve) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = url;
     link.onload = () => {
       loadedStylesheets.add(url);
+      pendingStylesheets.delete(url);
       resolve();
     };
     link.onerror = () => {
       console.warn(`Failed to load stylesheet: ${url}`);
+      pendingStylesheets.delete(url);
       resolve();
     };
 
     document.head.appendChild(link);
   });
+
+  pendingStylesheets.set(url, loadPromise);
+  return loadPromise;
 };
