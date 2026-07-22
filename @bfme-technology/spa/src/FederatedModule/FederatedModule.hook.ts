@@ -120,8 +120,8 @@ export const useMfeLoader = (props: FederatedModuleProps) => {
 
         initHostShareScopes();
 
-        const bustedCssUrl = cssUrl ? `${cssUrl}${cssUrl.includes('?') ? '&' : '?'}t=${Date.now()}` : undefined;
-        const bustedScriptUrl = scriptUrl ? `${scriptUrl}${scriptUrl.includes('?') ? '&' : '?'}t=${Date.now()}` : undefined;
+        const bustedCssUrl = cssUrl;
+        const bustedScriptUrl = scriptUrl;
 
         if (bustedCssUrl) await loadStylesheet(bustedCssUrl);
         if (bustedScriptUrl && mfeType !== 'federated') {
