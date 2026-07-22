@@ -198,6 +198,8 @@ import React2 from "react";
 import ReactDOM from "react-dom";
 var loadedScripts = /* @__PURE__ */ new Set();
 var loadedStylesheets = /* @__PURE__ */ new Set();
+var pendingScripts = /* @__PURE__ */ new Map();
+var pendingStylesheets = /* @__PURE__ */ new Map();
 var registerShare = (name, version, module, from = "@bfme-technology/spa") => {
   const win = window;
   if (!win.__webpack_share_scopes__) {
@@ -225,56 +227,58 @@ var initHostShareScopes = () => {
   registerShare("react-dom", "19.2.6", ReactDOM);
 };
 var loadScript = (url, mfeType) => {
-  return new Promise((resolve, reject) => {
-    if (loadedScripts.has(url)) {
-      resolve();
-      return;
-    }
-    const existingScript = document.querySelector(`script[src="${url}"]`);
-    if (existingScript) {
-      loadedScripts.add(url);
-      resolve();
-      return;
-    }
+  if (loadedScripts.has(url)) return Promise.resolve();
+  if (pendingScripts.has(url)) return pendingScripts.get(url);
+  const existingScript = document.querySelector(`script[src="${url}"]`);
+  if (existingScript) {
+    loadedScripts.add(url);
+    return Promise.resolve();
+  }
+  const loadPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = url;
     script.async = true;
     script.type = mfeType === "federated" ? "module" : "text/javascript";
     script.onload = () => {
       loadedScripts.add(url);
+      pendingScripts.delete(url);
       resolve();
     };
     script.onerror = () => {
+      pendingScripts.delete(url);
       reject(new Error(`Failed to load script: ${url}`));
     };
     document.body.appendChild(script);
   });
+  pendingScripts.set(url, loadPromise);
+  return loadPromise;
 };
 var loadStylesheet = (url) => {
-  return new Promise((resolve) => {
-    if (loadedStylesheets.has(url)) {
-      resolve();
-      return;
-    }
-    const existingLink = document.querySelector(`link[href="${url}"]`);
-    if (existingLink) {
-      loadedStylesheets.add(url);
-      resolve();
-      return;
-    }
+  if (loadedStylesheets.has(url)) return Promise.resolve();
+  if (pendingStylesheets.has(url)) return pendingStylesheets.get(url);
+  const existingLink = document.querySelector(`link[href="${url}"]`);
+  if (existingLink) {
+    loadedStylesheets.add(url);
+    return Promise.resolve();
+  }
+  const loadPromise = new Promise((resolve) => {
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = url;
     link.onload = () => {
       loadedStylesheets.add(url);
+      pendingStylesheets.delete(url);
       resolve();
     };
     link.onerror = () => {
       console.warn(`Failed to load stylesheet: ${url}`);
+      pendingStylesheets.delete(url);
       resolve();
     };
     document.head.appendChild(link);
   });
+  pendingStylesheets.set(url, loadPromise);
+  return loadPromise;
 };
 
 // src/FederatedModule/FederatedModule.hook.ts
@@ -558,9 +562,78 @@ var FederatedModule = (props) => {
   return null;
 };
 var FederatedModule_default = FederatedModule;
+
+// src/Breadcrumb.tsx
+import { useEffect as useEffect3, useState as useState3 } from "react";
+import { jsx as jsx2, jsxs as jsxs2 } from "react/jsx-runtime";
+var Breadcrumb = () => {
+  const [path, setPath] = useState3(window.location.pathname);
+  useEffect3(() => {
+    const handleLocationChange = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", handleLocationChange);
+    return () => window.removeEventListener("popstate", handleLocationChange);
+  }, []);
+  const pathParts = path.split("/").filter(Boolean);
+  const breadcrumbItems = [
+    { label: "Dashboard", icon: "fa-solid fa-chart-pie", path: "/" }
+  ];
+  pathParts.forEach((part, index) => {
+    const label = part.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+    const itemPath = "/" + pathParts.slice(0, index + 1).join("/");
+    breadcrumbItems.push({ label, icon: "", path: itemPath });
+  });
+  return /* @__PURE__ */ jsx2("nav", { className: "flex text-sm text-text-secondary font-medium mb-4", "aria-label": "Breadcrumb", children: /* @__PURE__ */ jsx2("ol", { className: "inline-flex items-center space-x-1 md:space-x-2", children: breadcrumbItems.map((item, index) => {
+    const isLast = index === breadcrumbItems.length - 1;
+    return /* @__PURE__ */ jsxs2("li", { className: "inline-flex items-center", children: [
+      index > 0 && /* @__PURE__ */ jsx2("i", { className: "fa-solid fa-chevron-right text-[10px] mx-2 opacity-50" }),
+      isLast ? /* @__PURE__ */ jsxs2("span", { className: "inline-flex items-center text-text-primary font-semibold", children: [
+        item.icon && /* @__PURE__ */ jsx2("i", { className: `${item.icon} mr-1.5` }),
+        item.label
+      ] }) : /* @__PURE__ */ jsxs2(
+        "a",
+        {
+          href: item.path,
+          className: "inline-flex items-center hover:text-primary-accent transition-colors",
+          children: [
+            item.icon && /* @__PURE__ */ jsx2("i", { className: `${item.icon} mr-1.5` }),
+            item.label
+          ]
+        }
+      )
+    ] }, item.path);
+  }) }) });
+};
+
+// src/Page.tsx
+import { jsx as jsx3, jsxs as jsxs3 } from "react/jsx-runtime";
+var Page = ({
+  title,
+  subtitle,
+  actionButton,
+  filterContent,
+  children,
+  className = ""
+}) => {
+  return /* @__PURE__ */ jsxs3("div", { className: `flex flex-col gap-6 font-body text-text-primary ${className}`, children: [
+    /* @__PURE__ */ jsx3(Breadcrumb, {}),
+    /* @__PURE__ */ jsxs3("div", { className: "flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4", children: [
+      /* @__PURE__ */ jsxs3("div", { className: "flex flex-col", children: [
+        /* @__PURE__ */ jsx3("h2", { className: "text-lg md:text-xl font-bold tracking-wide flex items-center gap-2", children: title }),
+        subtitle && /* @__PURE__ */ jsx3("p", { className: "text-xs text-text-secondary mt-1", children: subtitle })
+      ] }),
+      /* @__PURE__ */ jsxs3("div", { className: "flex flex-wrap items-center gap-4 mt-4 sm:mt-0", children: [
+        filterContent,
+        actionButton
+      ] })
+    ] }),
+    /* @__PURE__ */ jsx3("div", { className: "flex-grow flex flex-col gap-4", children })
+  ] });
+};
 export {
+  Breadcrumb,
   FederatedModule_default as FederatedModule,
   focusAreaLoadElement_default as FocusAreaLoadElement,
+  Page,
   initHostShareScopes,
   registerShare,
   useMfeLoader

@@ -3,3 +3,5 @@ export { default as FederatedModule } from './FederatedModule/FederatedModule';
 export { useMfeLoader } from './FederatedModule/FederatedModule.hook';
 export { initHostShareScopes, registerShare } from './FederatedModule/FederatedModule.utils';
 export type { FederatedModuleProps, MfeStatus, MfeType, MfeRouteConfig } from './FederatedModule/FederatedModule.types';
+export { Page, type PageProps } from './Page';
+export { Breadcrumb } from './Breadcrumb';
