@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import Pagination from "./Pagination";
+import SkeletonLoader from "./SkeletonLoader";
 import {
   gridWrapperClass,
   gridContainerClass,
@@ -428,9 +429,9 @@ const Grid = (props) => {
     ),
     mobileCardRenderer && React.createElement(
       "div",
-      { className: "block sm:hidden flex flex-col gap-3 mt-2" },
+      { className: "flex flex-col gap-3 mt-2 sm:hidden" },
       loading
-        ? React.createElement("div", { className: "text-center text-text-muted text-xs py-4" }, "Loading...")
+        ? React.createElement(SkeletonLoader, { showFilters: false, rowCount: 4, className: "sm:hidden" })
         : groupBy && activeGroups
         ? Object.keys(activeGroups).map((groupKey) => {
             const isGroupOpen = expandedGroups.has(groupKey);

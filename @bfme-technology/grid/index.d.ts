@@ -48,6 +48,15 @@ export default Grid;
 
 export declare const Pagination: React.FC<PaginationProps>;
 
+export type SkeletonLoaderProps = {
+  className?: string;
+  showFilters?: boolean;
+  columns?: string[];
+  rowCount?: number;
+};
+
+export declare const SkeletonLoader: React.FC<SkeletonLoaderProps>;
+
 export declare const gridWrapperClass: string;
 export declare const gridContainerClass: string;
 export declare const paginationContainerClass: string;
