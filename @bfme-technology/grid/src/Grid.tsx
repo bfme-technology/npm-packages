@@ -429,9 +429,9 @@ const Grid = (props) => {
     ),
     mobileCardRenderer && React.createElement(
       "div",
-      { className: "flex flex-col gap-3 mt-2 sm:hidden" },
+      { className: "max-sm:flex hidden flex-col gap-3 mt-2" },
       loading
-        ? React.createElement(SkeletonLoader, { showFilters: false, rowCount: 4, className: "sm:hidden" })
+        ? React.createElement(SkeletonLoader, { showFilters: false, rowCount: 4, className: "max-sm:flex hidden" })
         : groupBy && activeGroups
         ? Object.keys(activeGroups).map((groupKey) => {
             const isGroupOpen = expandedGroups.has(groupKey);
