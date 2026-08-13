@@ -360,7 +360,7 @@ const Grid = (props) => {
     React.createElement(
       "div",
       {
-        className: `${gridContainerClass} ${containerClassName || ""} ${mobileCardRenderer ? "hidden sm:block" : ""}`,
+        className: `${gridContainerClass} ${containerClassName || ""} ${mobileCardRenderer ? "max-sm:hidden" : ""}`,
         style: themeStyle,
       },
       React.createElement(
