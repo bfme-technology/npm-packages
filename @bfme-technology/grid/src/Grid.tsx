@@ -61,6 +61,17 @@ const getThemeCssVariables = (resolvedTheme) => {
   };
 };
 
+const gridResponsiveStyles = `
+@media (min-width: 640px) {
+  .bfme-grid-desktop { display: block !important; }
+  .bfme-grid-mobile { display: none !important; }
+}
+@media (max-width: 639.98px) {
+  .bfme-grid-desktop { display: none !important; }
+  .bfme-grid-mobile { display: flex !important; }
+}
+`;
+
 const DefaultMobileCard = ({ data, flatCols, index, renderCell }: any) => {
   if (!flatCols || flatCols.length === 0) return null;
 
@@ -440,10 +451,11 @@ const Grid = (props) => {
   return React.createElement(
     "div",
     { className: gridWrapperClass },
+    React.createElement("style", null, gridResponsiveStyles),
     React.createElement(
       "div",
       {
-        className: `${gridContainerClass} ${containerClassName || ""} hidden sm:!block`,
+        className: `${gridContainerClass} ${containerClassName || ""} bfme-grid-desktop`,
         style: themeStyle,
       },
       React.createElement(
@@ -512,9 +524,9 @@ const Grid = (props) => {
     ),
     React.createElement(
       "div",
-      { className: "flex flex-col gap-3 mt-2 sm:!hidden" },
+      { className: "bfme-grid-mobile flex-col gap-3 mt-2" },
       loading
-        ? React.createElement(SkeletonLoader, { showFilters: false, rowCount: 4, className: "sm:!hidden" })
+        ? React.createElement(SkeletonLoader, { showFilters: false, rowCount: 4, className: "bfme-grid-mobile" })
         : groupBy && activeGroups
         ? Object.keys(activeGroups).map((groupKey) => {
             const isGroupOpen = expandedGroups.has(groupKey);
