@@ -10,17 +10,21 @@ export type PaginatorInfo = {
 export type ColumnDef = {
   headerName?: string;
   field?: string;
-  cellRenderer?: React.ComponentType<any>;
+  cellRenderer?: React.ComponentType<any> | ((params: any) => any);
   cellRendererParams?: any;
+  cellStyle?: React.CSSProperties;
   children?: ColumnDef[];
+  colSpan?: number;
+  rowSpan?: number;
+  isExpandPlaceholder?: boolean;
   flex?: number;
   minWidth?: number;
   [key: string]: any;
 };
 
 export type GridProps = {
-  rowData: any[];
-  columnDefs: ColumnDef[];
+  rowData?: any[];
+  columnDefs?: ColumnDef[];
   loading?: boolean;
   themeMode?: "auto" | "light" | "dark";
   pagination?: boolean;
@@ -36,6 +40,13 @@ export type GridProps = {
   mobileCardRenderer?: (props: { data: any; index: number }) => React.ReactNode;
 };
 
+export type DefaultMobileCardProps = {
+  data: any;
+  flatCols: ColumnDef[];
+  index: number;
+  renderCell: (col: ColumnDef, row: any, index: number) => any;
+};
+
 export type PaginationProps = {
   paginatorInfo?: PaginatorInfo;
   paginationPageSize?: number;
@@ -46,6 +57,7 @@ export type PaginationProps = {
 export declare const Grid: React.FC<GridProps>;
 export default Grid;
 
+export declare const DefaultMobileCard: React.FC<DefaultMobileCardProps>;
 export declare const Pagination: React.FC<PaginationProps>;
 
 export type SkeletonLoaderProps = {
@@ -56,6 +68,7 @@ export type SkeletonLoaderProps = {
 };
 
 export declare const SkeletonLoader: React.FC<SkeletonLoaderProps>;
+export declare const useGrid: (props: GridProps) => any;
 
 export declare const gridWrapperClass: string;
 export declare const gridContainerClass: string;
@@ -66,3 +79,4 @@ export declare const pageSizeSelectorClass: string;
 export declare const pageSizeSelectClass: string;
 export declare const paginationButtonClass: string;
 export declare const pageInfoClass: string;
+export declare const gridResponsiveStyles: string;
