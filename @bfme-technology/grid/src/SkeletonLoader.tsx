@@ -31,7 +31,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       )}
 
       {/* Desktop Table Skeleton */}
-      <div className="hidden sm:block overflow-x-auto w-full">
+      <div className="hidden sm:!block overflow-x-auto w-full">
         <div className="w-full border-b border-border-color pb-3 flex text-xs font-extrabold text-text-secondary uppercase tracking-wider">
           {isCustomColumns ? (
             columns.map((colName, idx) => (
@@ -96,7 +96,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       </div>
 
       {/* Mobile Card Skeleton */}
-      <div className="max-sm:flex hidden flex-col gap-3">
+      <div className="flex flex-col gap-3 sm:!hidden">
         {rows.map((card) => (
           <div key={card} className="p-4 rounded-2xl bg-bg-deep border border-border-color flex flex-col gap-4">
             <div className="flex justify-between items-start">

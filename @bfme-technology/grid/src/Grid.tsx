@@ -360,7 +360,7 @@ const Grid = (props) => {
     React.createElement(
       "div",
       {
-        className: `${gridContainerClass} ${containerClassName || ""} ${mobileCardRenderer ? "max-sm:hidden" : ""}`,
+        className: `${gridContainerClass} ${containerClassName || ""} ${mobileCardRenderer ? "hidden sm:!block" : ""}`,
         style: themeStyle,
       },
       React.createElement(
@@ -429,9 +429,9 @@ const Grid = (props) => {
     ),
     mobileCardRenderer && React.createElement(
       "div",
-      { className: "max-sm:flex hidden flex-col gap-3 mt-2" },
+      { className: "flex flex-col gap-3 mt-2 sm:!hidden" },
       loading
-        ? React.createElement(SkeletonLoader, { showFilters: false, rowCount: 4, className: "max-sm:flex hidden" })
+        ? React.createElement(SkeletonLoader, { showFilters: false, rowCount: 4, className: "sm:!hidden" })
         : groupBy && activeGroups
         ? Object.keys(activeGroups).map((groupKey) => {
             const isGroupOpen = expandedGroups.has(groupKey);
