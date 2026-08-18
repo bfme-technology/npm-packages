@@ -8,6 +8,7 @@ export interface PageProps {
   filterContent?: ReactNode;
   children: ReactNode;
   className?: string;
+  icon?: string;
 }
 
 export const Page: React.FC<PageProps> = ({
@@ -17,6 +18,7 @@ export const Page: React.FC<PageProps> = ({
   filterContent,
   children,
   className = "",
+  icon,
 }) => {
   return (
     <div className={`glass-panel p-4 md:p-6 min-h-100 flex flex-col gap-6 font-body text-text-primary ${className}`}>
@@ -25,6 +27,7 @@ export const Page: React.FC<PageProps> = ({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex flex-col">
           <h2 className="text-lg md:text-xl font-bold tracking-wide flex items-center gap-2">
+            {icon && <i className={icon} />}
             {title}
           </h2>
           {subtitle && (
