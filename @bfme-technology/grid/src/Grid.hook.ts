@@ -9,7 +9,6 @@ export const useGrid = (props: GridProps) => {
     loading = false,
     pagination = true,
     paginate = true,
-    paginationPageSize = 10,
     paginatorInfo,
     onPageChange,
     onPageSizeChange,
@@ -20,6 +19,8 @@ export const useGrid = (props: GridProps) => {
     themeMode = "auto",
     mobileCardRenderer,
   } = props;
+  
+  const paginationPageSize = props.paginationPageSize ?? (paginatorInfo?.perPage || 10);
 
   const isPaginationEnabled = pagination && paginate;
 
