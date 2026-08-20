@@ -88,6 +88,9 @@ const Pagination = ({
           React.createElement("option", { value: "50" }, "50"),
           React.createElement("option", { value: "75" }, "75"),
           React.createElement("option", { value: "100" }, "100"),
+          React.createElement("option", { value: "250" }, "250"),
+          React.createElement("option", { value: "500" }, "500"),
+          React.createElement("option", { value: "1000" }, "1000"),
         ),
       ),
       React.createElement(
