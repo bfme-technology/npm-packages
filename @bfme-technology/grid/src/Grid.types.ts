@@ -31,6 +31,7 @@ export interface GridProps {
   paginatorInfo?: PaginatorInfo;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
+  onRowClick?: (row: any) => void;
   groupBy?: string;
   expandableRowRenderer?: React.ComponentType<{ data: any }>;
   containerClassName?: string;

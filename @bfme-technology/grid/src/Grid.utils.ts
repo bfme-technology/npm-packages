@@ -10,7 +10,10 @@ export const getResolvedTheme = (themeMode?: ThemeMode): "light" | "dark" => {
     return themeMode;
   }
   if (typeof document !== "undefined") {
-    if (document.documentElement.classList.contains("dark")) {
+    if (
+      document.documentElement.classList.contains("dark") ||
+      document.documentElement.getAttribute("data-theme") === "dark"
+    ) {
       return "dark";
     }
   }
@@ -18,28 +21,8 @@ export const getResolvedTheme = (themeMode?: ThemeMode): "light" | "dark" => {
 };
 
 export const getThemeCssVariables = (resolvedTheme: "light" | "dark"): Record<string, string> => {
-  if (resolvedTheme === "dark") {
-    return {
-      "--bg-surface": "#1e293b",
-      "--bg-deep": "#0f172a",
-      "--bg-elevated": "#334155",
-      "--border-color": "#475569",
-      "--text-primary": "#f1f5f9",
-      "--text-secondary": "#cbd5e1",
-      "--text-muted": "#94a3b8",
-      "--primary-accent": "#6366f1",
-    };
-  }
-  return {
-    "--bg-surface": "#ffffff",
-    "--bg-deep": "#f8fafc",
-    "--bg-elevated": "#f1f5f9",
-    "--border-color": "#e2e8f0",
-    "--text-primary": "#0f172a",
-    "--text-secondary": "#475569",
-    "--text-muted": "#64748b",
-    "--primary-accent": "#4f46e5",
-  };
+  // Let the host application provide these CSS variables globally
+  return {};
 };
 
 export const renderCell = (col: ColumnDef, row: any, index: number): any => {

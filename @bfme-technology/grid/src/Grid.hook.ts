@@ -41,7 +41,7 @@ export const useGrid = (props: GridProps) => {
       observer = new MutationObserver(handleThemeChange);
       observer.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["class"],
+        attributeFilter: ["class", "data-theme"],
       });
     }
 
