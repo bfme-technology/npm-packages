@@ -66,7 +66,10 @@ export const Grid: React.FC<GridProps> = (props) => {
 
     return (
       <React.Fragment key={rowId}>
-        <tr className={trClass}>
+        <tr
+          className={`${trClass} ${props.onRowClick ? "cursor-pointer" : ""}`}
+          onClick={() => props.onRowClick && props.onRowClick(row)}
+        >
           {hasExpand && (
             <td className={expandCellClass}>
               <button

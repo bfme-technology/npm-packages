@@ -26,7 +26,7 @@ export const Page: React.FC<PageProps> = ({
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex flex-col">
-          <h2 className="text-lg md:text-xl font-bold tracking-wide flex items-center gap-2">
+          <h2 className="text-lg md:text-xl font-bold tracking-wide flex items-center gap-2 text-text-primary">
             {icon && <i className={icon} />}
             {title}
           </h2>
