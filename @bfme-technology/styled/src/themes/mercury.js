@@ -17,7 +17,7 @@ export const getLayoutNavLinkClass = ({ isActive }) =>
     "flex items-center rounded-2xl text-sm font-medium transition-all duration-300 pl-2 pr-4 py-2.5",
     isActive
       ? "bg-primary-accent-bg text-primary-accent border-l-4 border-primary-accent font-semibold shadow-[0_0_15px_rgba(13,148,136,0.15)]"
-      : "text-text-secondary hover:text-text-primary hover:bg-bg-surface/40",
+      : "text-text-secondary hover:text-text-primary hover:bg-bg-surface",
   ].join(" ");
 
 export const navIconClass = "inline-flex items-center justify-center w-8 h-8 rounded-xl text-base shrink-0 bg-primary-accent-bg text-primary-accent";
@@ -46,7 +46,7 @@ export const getThemeToggleButtonClass = ({ isActive }) =>
 export const contentAreaClass = "flex-grow min-w-0 overflow-y-auto p-4 md:p-6 flex flex-col gap-4 md:gap-6";
 
 export const breadcrumbContainerClass =
-  "mb-4 rounded-xl border border-border-color/40 bg-bg-surface/50 px-4 py-2.5 shadow-sm backdrop-blur-sm";
+  "mb-4 rounded-xl border border-border-color bg-bg-surface px-4 py-2.5 shadow-sm backdrop-blur-sm";
 
 export const breadcrumbListClass = "mb-0 flex list-none items-center gap-2 text-xs font-semibold uppercase tracking-wider";
 
@@ -70,7 +70,7 @@ export const metricsGridClass =
   "grid grid-cols-1 gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3";
 
 export const metricCardClass =
-  "rounded-2xl border border-border-color bg-bg-surface/60 p-5 md:p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-primary-accent/20 hover:shadow-teal-950/20";
+  "rounded-2xl border border-border-color bg-bg-surface p-5 md:p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-primary-accent/20 hover:shadow-teal-950/20";
 
 export const metricCardTitleClass =
   "text-[11px] font-bold text-text-secondary tracking-wider uppercase";
@@ -78,7 +78,7 @@ export const metricCardTitleClass =
 export const metricValueClass = "m-0 text-xl md:text-2xl font-extrabold text-primary-accent font-display tracking-tight";
 
 export const gridContainerClass =
-  "h-[60vh] min-h-[500px] w-full overflow-hidden rounded-2xl border border-border-color bg-bg-surface/60 shadow-lg backdrop-blur-sm";
+  "h-[60vh] min-h-[500px] w-full overflow-hidden rounded-2xl border border-border-color bg-bg-surface shadow-lg backdrop-blur-sm";
 
 export const gridPageWrapperClass =
   "flex h-full w-full flex-col gap-4";
@@ -99,7 +99,7 @@ export const gridFilterSelectClass =
   "min-w-[130px] cursor-pointer rounded-xl border border-border-color bg-bg-deep p-2.5 text-xs text-text-primary focus:border-primary-accent focus:outline-none focus:ring-2 focus:ring-primary-accent/20 transition-all duration-200";
 
 export const gridPrimaryButtonClass =
-  "inline-flex items-center gap-1.5 rounded-xl border border-primary-accent bg-primary-accent px-4 py-2.5 text-xs font-bold text-bg-deep dark:text-black transition-all duration-200 hover:bg-primary-accent/90 hover:border-primary-accent/90 hover:shadow-lg active:scale-[0.98]";
+  "inline-flex items-center gap-1.5 rounded-xl border border-primary-accent bg-primary-accent px-4 py-2.5 text-xs font-bold text-bg-deep dark:text-black transition-all duration-200 hover:bg-primary-accent hover:border-primary-accent/90 hover:shadow-lg active:scale-[0.98]";
 
 export const gridContentSectionClass = "flex flex-1 flex-col gap-3";
 
